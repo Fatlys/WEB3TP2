@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HUD Scouter - Dragon Ball Z</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet">
+    <link rel="stylesheet" href="./src/css/styles.css">
+</head>
+<body>
+
+    <div class="scan-linee"></div>
+
+    <div class="hud-wrapper container-fluid">
+        <main class="hud-grid">
+
+            <!-- HEADER -->
+            <header class="hud-header hud-panel">
+                <div class="hud-logo">DBZ</div>
+                <h1 class="hud-title">SCOUTER INTERFACE</h1>
+            </header>
+
+            <!-- PANNEAU GAUCHE -->
+            <aside class="hud-left hud-panel">
+                <h2 class="hud-section-title">
+                    <i class="bi bi-people-fill me-2"></i>GUERRIERS
+                </h2>
+
+                <div class="character-list">
+                    <button class="character-btn active" data-char="goku">
+                        <span class="status-dot"></span>
+                        <span>Son Goku</span>
+                    </button>
+                    <button class="character-btn" data-char="vegeta">
+                        <span class="status-dot"></span>
+                        <span>Vegeta</span>
+                    </button>
+                    <button class="character-btn" data-char="frieza">
+                        <span class="status-dot" style="background: #ff0000;"></span>
+                        <span>Frieza</span>
+                    </button>
+                </div>
+
+                <!-- Z-DOG EN BAS -->
+                <h3 class="hud-section-title mt-3">
+                    <i class="bi bi-stars me-2"></i>Dragon Ball
+                </h3>
+                <div class="hud-dragonball-wrapper">
+                    <canvas id="zdog-canvas" width="180" height="150"></canvas>
+                    <p style="font-size: 0.8em; color: #ffff00; margin-top: 5px; text-align: center;">⭐ 2 ÉTOILES</p>
+                </div>
+            </aside>
+
+            <!-- PANNEAU CENTRAL -->
+            <section class="hud-center hud-panel">
+                <div class="character-display">
+                    <img src="./assets/img/goku.png" alt="Son Goku" class="character-img active" data-char="goku">
+                    <img src="./assets/img/Vegeta.png" alt="Vegeta" class="character-img" data-char="vegeta">
+                    <img src="./assets/img/Gohan.png" alt="Gohan" class="character-img" data-char="gohan">
+                    <img src="./assets/img/Piccolo.png" alt="Piccolo" class="character-img" data-char="piccolo">
+                    <img src="./assets/img/Frieza.png" alt="Frieza" class="character-img" data-char="frieza">
+                    <div class="crosshair"></div>
+                </div>
+            </section>
+
+            <!-- PANNEAU DROIT -->
+            <aside class="hud-right hud-panel">
+                <!-- TABLEAU KI EN HAUT -->
+                <h2 class="hud-section-title">
+                    <i class="bi bi-activity me-2"></i>Tableau KI
+                </h2>
+                <div class="hud-chart-wrapper">
+                    <canvas id="activityChart" width="300" height="120"></canvas>
+                </div>
+
+                <!-- CARTE EN BAS -->
+                <h3 class="hud-section-title mt-3">
+                    <i class="bi bi-globe me-2"></i>CARTE
+                </h3>
+                <div id="map" class="hud-map">
+                    <div class="map-coordinates" id="map-coords">
+                        23.4162° N, 162.9554° E
+                    </div>
+                </div>
+
+                <button class="lock-button" id="lock-target">
+                    <i class="bi bi-crosshair"></i> LOCK TARGET
+                </button>
+            </aside>
+
+            <!-- FOOTER -->
+            <footer class="hud-footer hud-panel">
+                <div class="power-item">
+                    <h4>基本戦闘力</h4>
+                    <div class="power-value" id="base-power">9001</div>
+                    <div class="power-bar">
+                        <div class="power-bar-fill" style="width: 85%;"></div>
+                    </div>
+                </div>
+                
+                <div class="power-item">
+                    <h4>現在の戦闘力</h4>
+                    <div class="power-value" id="current-power">12000</div>
+                    <div class="power-bar">
+                        <div class="power-bar-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+                
+                <div class="power-item">
+                    <h4>最大戦闘力</h4>
+                    <div class="power-value" id="max-power">150000</div>
+                    <div class="power-bar">
+                        <div class="power-bar-fill" style="width: 60%;"></div>
+                    </div>
+                </div>
+            </footer>
+
+        </main>
+    </div>
+
+    <audio id="lock-sound" src="./assets/audio/sound.mp3" preload="auto"></audio>
+
+    <div class="modal fade" id="transformModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background: rgba(0, 0, 0, 0.95); border: 3px solid #ffff00; color: #ffff00;">
+                <div class="modal-header" style="border-bottom: 2px solid #ffff00;">
+                    <h5 class="modal-title" style="font-family: 'Orbitron', sans-serif;">⚡ DÉTECTION ⚡</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center" style="padding: 30px;">
+                    <div style="font-size: 3em; margin-bottom: 20px;">🔥💥⚡</div>
+                    <h3 id="transform-name" style="color: #ff0000; font-size: 2em; text-shadow: 0 0 20px #ff0000;">CIBLE DÉTECTÉE</h3>
+                    <p style="color: #00ff00; font-size: 1.2em; margin-top: 15px;">
+                        CIBLE VERROUILLÉE!
+                    </p>
+                    <div class="progress mt-3" style="height: 25px; background: rgba(0, 255, 0, 0.2);">
+                        <div id="power-progress" class="progress-bar" style="background: linear-gradient(90deg, #ffff00, #ff0000); width: 0%;" role="progressbar"></div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 2px solid #ffff00; justify-content: center;">
+                    <button type="button" class="btn" data-bs-dismiss="modal" style="background: #ff0000; color: #000; font-weight: bold; padding: 10px 30px;">FERMER</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+    <script src="https://unpkg.com/zdog@1/dist/zdog.dist.min.js"></script>
+    <script src="https://unpkg.com/tone@14.8.49/build/Tone.js"></script>
+
+    <script src="src/js/vfx.js"></script>
+    <script src="src/js/animejs.js"></script>
+    <script src="src/js/chartjs.js"></script>
+    <script src="src/js/maplibre.js"></script>
+    <script src="src/js/zdog.js"></script>
+    <script src="src/js/tonejs.js"></script>
+    <script src="src/js/bootstrap.js"></script>
+
+</body>
+</html>
