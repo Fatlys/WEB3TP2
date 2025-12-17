@@ -1,7 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
-  if (!document.getElementById("map") || !window.maplibregl) return;
-
-  const map = new maplibregl.Map({
+ const map = new maplibregl.Map({
     container: "map",
     style: "https://demotiles.maplibre.org/style.json",
     center: [162.9554, 23.4162],
@@ -19,4 +16,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
  
-});
